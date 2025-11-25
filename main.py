@@ -20,7 +20,7 @@ BACKGROUND_FILE = "background.png"
 USERNAME = "匿名"
 WANT_AUTO_SEND = 0
 global HOTKEY
-HOTKEY = "enter"
+HOTKEY = "f1"
 
 
 # 预定义的字体列表（需要根据系统调整路径）
@@ -112,7 +112,7 @@ def on_hotkey_pressed():
 
         # 发送全选与复制（Linux 使用 ctrl）
         keyboard.send('ctrl+a')
-        time.sleep(0.06)
+        #time.sleep(0.06)
         keyboard.send('ctrl+x')
         time.sleep(0.5)
         # keyboard.send('backspace')
@@ -120,7 +120,10 @@ def on_hotkey_pressed():
         # 读取剪贴板文本作为对话内容
         dialog_text = ''
         try:
-            dialog_text = subprocess.check_output(["wl-paste"], text=True).strip()
+            if sys.platform.startswith('win'):
+                dialog_text = pyperclip.paste()
+            else:
+                dialog_text = subprocess.check_output(["wl-paste"], text=True).strip()
         except Exception:
             dialog_text = ''
 
@@ -150,6 +153,7 @@ def on_hotkey_pressed():
             print(f'无法直接复制图片到剪贴板，已将图片保存为: {tmp.name}')
         
         keyboard.send('ctrl+v')
+        time.sleep(0.1)
         if (WANT_AUTO_SEND != 0):
             keyboard.send('enter')
 
@@ -188,6 +192,7 @@ if __name__ == '__main__':
     print(AVATAR_FILE)
     print(BACKGROUND_FILE)
     print(USERNAME)
+    print(WANT_AUTO_SEND)
     if start_hotkey_listener() == 0:
         sys.exit(0)
     elif start_hotkey_listener() == 1:

@@ -1,3 +1,12 @@
+<<<<<<< HEAD
+{
+  "avatar_image_path": "D:/你个猪币（金币版）.png",
+  "background_image_path": "",
+  "username": "DaShaBi",
+  "hotkey": "f1",
+  "font_index": 0,
+  "want_auto_send": 1
+=======
 {
   "avatar_image_path": "avatar.png",
   "background_image_path": "background.png",
@@ -5,4 +14,5 @@
   "hotkey": "enter",
   "font_index": 0,
   "want_auto_send": 0
+>>>>>>> 88ea61ecda1a79390b43689d0ed05a0e355ab74c
 }

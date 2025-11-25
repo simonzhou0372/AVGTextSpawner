@@ -1,9 +1,21 @@
 from PIL import Image, ImageDraw, ImageFont
 from pathlib import Path
+import os
 
 FONTS_LIST = [
 
 ]
+
+def resource_path(relative_path):
+    # 获取当前文件的绝对路径
+    current_path = os.path.abspath(__file__)
+    # 获取当前文件所在的目录
+    current_directory = os.path.dirname(current_path)
+    # 解析相对路径为绝对路径    
+    absolute_path = os.path.join(current_directory, relative_path)
+    print("Resource path:", absolute_path)
+    return absolute_path
+
 
 def get_available_font(font_index: int = 0, font_size: int = 32) -> ImageFont.FreeTypeFont:
     """
@@ -13,7 +25,8 @@ def get_available_font(font_index: int = 0, font_size: int = 32) -> ImageFont.Fr
     这里忽略用户传入的 font_index，始终锁定为内部字体，满足“不需要用户自定义字体”的需求。
     """
     try: 
-        return ImageFont.truetype("fonts/NotoSansCJK-Bold.ttc", font_size)
+        p = resource_path("fonts\\NotoSansCJK-Bold.ttc")
+        return ImageFont.truetype(p, font_size)
     except Exception:
         # 回退到 Pillow 的默认位图字体（可能无法按像素精确缩放）
         print("未获取到字体！")

@@ -21,7 +21,7 @@ class ConfigGUI(QMainWindow):
         self.load_config()
 
     def initUI(self):
-        self.setWindowTitle('ADV Text Spawner 配置')
+        self.setWindowTitle('AVG Text Spawner 配置')
         self.setGeometry(100, 100, 900, 1000)
         
         # 设置样式
@@ -315,7 +315,8 @@ class ConfigGUI(QMainWindow):
             try:
                 # 启动main.py
                 if sys.platform.startswith('win'):
-                    self.process = subprocess.Popen([sys.executable, 'main.py'])
+                    #self.process = subprocess.Popen([sys.executable, 'main.py'])
+                    self.process = subprocess.Popen(['main.exe'])
                 else:
                     self.process = subprocess.Popen(['sudo', '-E', sys.executable, 'main.py'])
                 self.status_indicator.setStyleSheet("background-color: green; border-radius: 8px;")
