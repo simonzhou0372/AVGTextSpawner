@@ -17,7 +17,7 @@ def resource_path(relative_path):
     return absolute_path
 
 
-def get_available_font(font_index: int = 0, font_size: int = 32) -> ImageFont.FreeTypeFont:
+def get_available_font(font_index, font_size: int = 32) -> ImageFont.FreeTypeFont:
     """
     固定使用 Pillow 包自带的可缩放字体（优先尝试 DejaVuSans.ttf），
     如果不可用则回退到 ImageFont.load_default()（位图字体，无法缩放）。
@@ -25,7 +25,7 @@ def get_available_font(font_index: int = 0, font_size: int = 32) -> ImageFont.Fr
     这里忽略用户传入的 font_index，始终锁定为内部字体，满足“不需要用户自定义字体”的需求。
     """
     try: 
-        p = resource_path("fonts\\NotoSansCJK-Bold.ttc")
+        p = resource_path("fonts\\" + font_index)
         return ImageFont.truetype(p, font_size)
     except Exception:
         # 回退到 Pillow 的默认位图字体（可能无法按像素精确缩放）
@@ -35,7 +35,7 @@ def get_available_font(font_index: int = 0, font_size: int = 32) -> ImageFont.Fr
 
 def wrap_text(text: str, max_width: int, font: ImageFont.FreeTypeFont) -> list:
     """
-    文本换行处理
+    文本换行处理，支持原始换行符
     
     Args:
         text: 原始文本
@@ -45,24 +45,31 @@ def wrap_text(text: str, max_width: int, font: ImageFont.FreeTypeFont) -> list:
     Returns:
         换行后的文本列表
     """
-    words = text
     lines = []
-    current_line = ""
+    # 先按原始换行符分割文本
+    paragraphs = text.split('\n')
     
-    for char in words:
-        test_line = current_line + char
-        bbox = font.getbbox(test_line)
-        line_width = bbox[2] - bbox[0]
+    for paragraph in paragraphs:
+        if not paragraph:  # 处理空行
+            lines.append("")
+            continue
+            
+        current_line = ""
+        for char in paragraph:
+            test_line = current_line + char
+            bbox = font.getbbox(test_line)
+            line_width = bbox[2] - bbox[0]
+            
+            if line_width > max_width:
+                if current_line:
+                    lines.append(current_line)
+                current_line = char
+            else:
+                current_line = test_line
         
-        if line_width > max_width:
-            if current_line:
-                lines.append(current_line)
-            current_line = char
-        else:
-            current_line = test_line
+        if current_line:
+            lines.append(current_line)
     
-    if current_line:
-        lines.append(current_line)
     print("    wrap text成功！")
     return lines
 

@@ -3,9 +3,9 @@ import json
 import subprocess
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, 
                             QHBoxLayout, QLabel, QLineEdit, QPushButton, 
-                            QFileDialog, QSpinBox, QCheckBox, QGroupBox, QMessageBox)
+                            QFileDialog, QCheckBox, QGroupBox, QMessageBox, QComboBox)
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QPixmap
+from PyQt5.QtGui import QPixmap, QIcon
 from PyQt5.QtCore import QTimer
 from pathlib import Path
 import picture_spawner
@@ -19,10 +19,12 @@ class ConfigGUI(QMainWindow):
         self.config_file = "config.json"
         self.initUI()
         self.load_config()
+        self.preview_image()
 
     def initUI(self):
         self.setWindowTitle('AVG Text Spawner 配置')
-        self.setGeometry(100, 100, 900, 1000)
+        self.setFixedSize(700, 800) 
+        #self.setGeometry(100, 100, 700, 800)
         
         # 设置样式
         self.setStyleSheet("""
@@ -30,14 +32,19 @@ class ConfigGUI(QMainWindow):
                 background-color: #f0f0f0;
             }
             QPushButton {
-                background-color: #4CAF50;
+                background-color: #4A90E2;
                 color: white;
                 border: none;
-                padding: 8px;
-                border-radius: 4px;
+                padding: 8px 16px;
+                border-radius: 6px;
+                font-weight: bold;
+                min-height: 30px;
             }
             QPushButton:hover {
-                background-color: #45a049;
+                background-color: #357ABD;
+            }
+            QPushButton:pressed {
+                background-color: #2968A3;
             }
             QLineEdit {
                 padding: 8px;
@@ -109,17 +116,17 @@ class ConfigGUI(QMainWindow):
         layout.addLayout(hotkey_layout)
 
 
-        # 字体索引
+        # 字体选择（修改为下拉框）
         font_layout = QHBoxLayout()
-        self.font_index = QSpinBox()
-        self.font_index.setRange(0, 10)
-        font_layout.addWidget(QLabel('字体索引:'))
-        font_layout.addWidget(self.font_index)
-        layout.addLayout(font_layout)
+        self.font_combo = QComboBox()
+        self.load_fonts()  # 加载字体列表
+        font_layout.addWidget(QLabel('字体选择:'))
+        font_layout.addWidget(self.font_combo)
+        config_layout.addLayout(font_layout)
 
         # 自动发送
         self.auto_send = QCheckBox('自动发送')
-        layout.addWidget(self.auto_send)
+        config_layout.addWidget(self.auto_send)
 
         # 添加预览按钮
         preview_btn = QPushButton('预览效果')
@@ -156,10 +163,19 @@ class ConfigGUI(QMainWindow):
         self.run_btn = QPushButton('运行服务')
         self.run_btn.clicked.connect(self.run_service)
         
-        btn_layout.addWidget(self.status_indicator)
         btn_layout.addWidget(save_btn)
         btn_layout.addWidget(self.run_btn)
+        btn_layout.addWidget(self.status_indicator)
         layout.addLayout(btn_layout)
+
+    def load_fonts(self):
+        """加载fonts文件夹中的字体文件"""
+        fonts_dir = Path("fonts")
+        if fonts_dir.exists():
+            font_files = [f.name for f in list(fonts_dir.glob("*.ttf")) + list(fonts_dir.glob("*.ttc"))]
+            self.font_combo.addItems(font_files)
+        else:
+            self.font_combo.addItem("默认字体")
 
     def detect_hotkey(self):
         """检测用户输入的热键，按ESC退出"""
@@ -254,9 +270,9 @@ class ConfigGUI(QMainWindow):
                 avatar_path=avatar_path,
                 background_path=background_path,
                 username=username,
-                dialog_text="这是一段预览文本\n用于展示生成的对话框\n",
-                font_index=self.font_index.value(),
-                img_size=(1200, 300),
+                dialog_text="这是一段预览文本\n用于展示生成的对话框",
+                font_index=self.font_combo.currentText(),
+                img_size=(900, 300),
                 output_path=temp_path
             )
             
@@ -288,7 +304,12 @@ class ConfigGUI(QMainWindow):
                 self.bg_path.setText(config.get('background_image_path', ''))
                 self.username.setText(config.get('username', ''))
                 self.hotkey.setText(config.get('hotkey', 'enter'))
-                self.font_index.setValue(config.get('font_index', 0))
+                # 加载保存的字体
+                font_name = config.get('font_name', '')
+                if font_name:
+                    index = self.font_combo.findText(font_name)
+                    if index >= 0:
+                        self.font_combo.setCurrentIndex(index)
                 self.auto_send.setChecked(config.get('want_auto_send', 0))
         except Exception as e:
             print(f"加载配置文件失败: {e}")
@@ -299,7 +320,7 @@ class ConfigGUI(QMainWindow):
             'background_image_path': self.bg_path.text(),
             'username': self.username.text(),
             'hotkey': self.hotkey.text(),
-            'font_index': self.font_index.value(),
+            'font_name': self.font_combo.currentText(),  # 改为保存字体名称
             'want_auto_send': 1 if self.auto_send.isChecked() else 0
         }
         try:
@@ -337,6 +358,7 @@ class ConfigGUI(QMainWindow):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
+    app.setWindowIcon(QIcon('src/icon.png'))
     gui = ConfigGUI()
     gui.show()
     sys.exit(app.exec_())

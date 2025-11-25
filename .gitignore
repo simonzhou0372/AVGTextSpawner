@@ -1,7 +1,6 @@
 .venv/
 __pycache__/
 fonts/
-<<<<<<< HEAD
 build/
 dist/
 *.pyc
@@ -12,8 +11,3 @@ output.png
 avatar.png
 background.png
 *.exe
-=======
-output.png
-avatar.png
-background.png
->>>>>>> 88ea61ecda1a79390b43689d0ed05a0e355ab74c
