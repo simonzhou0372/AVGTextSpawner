@@ -138,7 +138,7 @@ def on_hotkey_pressed():
             username=USERNAME,
             dialog_text=dialog_text,
             font_index='STKAITI.TTF',
-            img_size=(1200, 300),
+            img_size=(900, 300),
             output_path=None
         )
 
