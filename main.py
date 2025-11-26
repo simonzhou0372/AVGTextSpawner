@@ -1,5 +1,4 @@
 from PIL import Image
-import matplotlib.font_manager as fm
 import keyboard
 import pyperclip
 from pathlib import Path
@@ -9,12 +8,12 @@ import tempfile
 import shutil
 import sys
 import io
-
+import os
 import config
 import picture_spawner
 
 # 全局热键变量
-CONFIG_FILE = "config.json"
+CONFIG_FILE = os.path.join(os.path.expanduser('~'), 'ADVTextSpawner', 'config.json')
 AVATAR_FILE = "avatar.png"
 BACKGROUND_FILE = "background.png"
 USERNAME = "匿名"
@@ -138,7 +137,7 @@ def on_hotkey_pressed():
             background_path=BACKGROUND_FILE,
             username=USERNAME,
             dialog_text=dialog_text,
-            font_index=0,
+            font_index='STKAITI.TTF',
             img_size=(1200, 300),
             output_path=None
         )

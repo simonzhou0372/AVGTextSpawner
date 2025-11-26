@@ -169,8 +169,10 @@ class ConfigGUI(QMainWindow):
         layout.addLayout(btn_layout)
 
     def load_fonts(self):
-        """加载fonts文件夹中的字体文件"""
-        fonts_dir = Path("fonts")
+        if sys.platform.startswith('win'):
+            fonts_dir = Path("C:/Windows/Fonts")
+        else:
+            fonts_dir = Path("/usr/share/fonts")
         if fonts_dir.exists():
             font_files = [f.name for f in list(fonts_dir.glob("*.ttf")) + list(fonts_dir.glob("*.ttc"))]
             self.font_combo.addItems(font_files)
@@ -335,8 +337,9 @@ class ConfigGUI(QMainWindow):
             self.save_config()  # 先保存当前配置
             try:
                 # 启动main.py
+                
                 if sys.platform.startswith('win'):
-                    #self.process = subprocess.Popen([sys.executable, 'main.py'])
+                   # self.process = subprocess.Popen([sys.executable, 'main.py'])
                     self.process = subprocess.Popen(['main.exe'])
                 else:
                     self.process = subprocess.Popen(['sudo', '-E', sys.executable, 'main.py'])

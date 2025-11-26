@@ -1,23 +1,9 @@
 from PIL import Image, ImageDraw, ImageFont
 from pathlib import Path
 import os
+import sys
 
-FONTS_LIST = [
-
-]
-
-def resource_path(relative_path):
-    # 获取当前文件的绝对路径
-    current_path = os.path.abspath(__file__)
-    # 获取当前文件所在的目录
-    current_directory = os.path.dirname(current_path)
-    # 解析相对路径为绝对路径    
-    absolute_path = os.path.join(current_directory, relative_path)
-    print("Resource path:", absolute_path)
-    return absolute_path
-
-
-def get_available_font(font_index, font_size: int = 32) -> ImageFont.FreeTypeFont:
+def get_available_font(font_index: str, font_size: int = 32) -> ImageFont.FreeTypeFont:
     """
     固定使用 Pillow 包自带的可缩放字体（优先尝试 DejaVuSans.ttf），
     如果不可用则回退到 ImageFont.load_default()（位图字体，无法缩放）。
@@ -25,7 +11,12 @@ def get_available_font(font_index, font_size: int = 32) -> ImageFont.FreeTypeFon
     这里忽略用户传入的 font_index，始终锁定为内部字体，满足“不需要用户自定义字体”的需求。
     """
     try: 
-        p = resource_path("fonts\\" + font_index)
+        if sys.platform.startswith('win'):
+            fonts_dir = "C:/Windows/Fonts/"
+        else:
+            fonts_dir = "/usr/share/fonts/"
+        p = Path(fonts_dir + font_index)
+        print(p)
         return ImageFont.truetype(p, font_size)
     except Exception:
         # 回退到 Pillow 的默认位图字体（可能无法按像素精确缩放）
